@@ -192,6 +192,9 @@ class Server extends SimpleContainer implements IServerContainer {
 		$this->registerService('Db', function($c){
 			return new Db();
 		});
+		$this->registerService('AppInfoXMLReader', function($c) {
+			return new \OC\App\InfoXMLReader();
+		});
 	}
 
 	/**
@@ -438,5 +441,12 @@ class Server extends SimpleContainer implements IServerContainer {
 	 */
 	function getDb() {
 		return $this->query('Db');
+	}
+
+	/**
+	 * @return \OC\App\InfoXMLReader
+	 */
+	function getAppInfoXMLReader() {
+		return $this->query('AppInfoXMLReader');
 	}
 }
