@@ -1837,6 +1837,47 @@
 				self.updateStorageStatistics();
 			});
 
+		},
+
+		/**
+		 * Scroll to the last uploaded file
+		 * Highlight uploaded files
+		 * @param files array of filenames
+		 */
+		highlightUploadedFiles: function(files) {
+			// Detection of the uploaded element
+			var filename = files[files.length - 1].name;
+			var $fileRow = this.findFileEl(filename);
+
+			while(!$fileRow.exists() && this._nextPage(false) !== false) { // Checking element existence
+				$fileRow = this.findFileEl(filename);
+			}
+
+			if (!$fileRow.exists()) { // Element not present in the file list
+				return;
+			}
+
+			var currentOffset = this.$container.scrollTop();
+			var additionalOffset = this.$el.find("#controls").height()+this.$el.find("#controls").offset().top;
+
+			var _this = this;
+			this.$container.animate({
+				// Scrolling to the top of the new element
+				scrollTop: currentOffset + $fileRow.offset().top - additionalOffset
+			}, {
+				duration: 500,
+				complete: function() {
+					// Highlighting all uploaded file
+					for(var i=0; i<files.length; i++) {
+						var $fileRow = _this.findFileEl(files[i].name);
+
+						if($fileRow.length !== 0) { // Checking element existence
+							$fileRow.addClass("highlightUploaded");
+						}
+					}
+
+				}
+			});
 		}
 	};
 

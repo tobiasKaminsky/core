@@ -424,6 +424,13 @@ OC.Upload = {
 						data.textStatus = 'servererror';
 						data.errorThrown = result[0].data.message; // error message has been translated on server
 						fu._trigger('fail', e, data);
+					} else { // Successful upload
+						// Checking that the uploaded file is the last one
+						if (data.files[0] === data.originalFiles[data.originalFiles.length - 1] &&
+							result[0].directory === "/") {
+							// Scroll to the last uploaded file and highlight all of them
+							FileList.highlightUploadedFiles(data.originalFiles);
+						}
 					}
 				},
 				/**
