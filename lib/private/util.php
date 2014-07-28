@@ -744,10 +744,11 @@ class OC_Util {
 	/**
 	 * Check if the app is enabled, redirects to home if not
 	 * @param string $app
+	 * @param bool $checkUser whether to check if the logged in user has access to the app or just check if the app is installed
 	 * @return void
 	 */
-	public static function checkAppEnabled($app) {
-		if( !OC_App::isEnabled($app)) {
+	public static function checkAppEnabled($app, $checkUser = true) {
+		if( !OC_App::isEnabled($app, $checkUser)) {
 			header( 'Location: '.OC_Helper::linkToAbsolute( '', 'index.php' ));
 			exit();
 		}
