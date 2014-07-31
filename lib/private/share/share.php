@@ -1409,7 +1409,24 @@ class Share extends \OC\Share\Constants {
 				$row['displayname_owner'] = \OCP\User::getDisplayName($row['uid_owner']);
 			}
 
-			$items[$row['id']] = $row;
+
+			//add item to result, make sure that we don't have duplicates
+			//TODO Does this only happens for files shared with me?
+			//TODO if I want to get all files I shared they should be still seperated
+			$updated = false;
+			if (isset($shareWith) && $shareWith === \OCP\User::getUser()) {
+				foreach ($items as $key => $item) {
+					if ($item['file_source'] === $row['file_source']) {
+						$items[$key]['permissions'] = (int) $items[$key]['permissions'] | (int) $row['permissions'];
+						$updated = true;
+						break;
+					}
+				}
+			}
+
+			if ($updated === false) {
+				$items[$row['id']] = $row;
+			}
 		}
 		if (!empty($items)) {
 			$collectionItems = array();
