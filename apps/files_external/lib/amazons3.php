@@ -52,7 +52,7 @@ class AmazonS3 extends \OC\Files\Storage\Common {
 	/**
 	 * @var int
 	 */
-	private $timeout = 15;
+	private $timeout = 1;
 
 	/**
 	 * @param string $path
@@ -509,6 +509,12 @@ class AmazonS3 extends \OC\Files\Storage\Common {
 		$path2 = $this->normalizePath($path2);
 
 		if ($this->is_file($path1)) {
+			if ($this->is_dir($path2)) {
+				$this->rmdir($path2);
+			} else if ($this->file_exists($path2)) {
+				$this->unlink($path2);
+			}
+
 			if ($this->copy($path1, $path2) === false) {
 				return false;
 			}
@@ -518,8 +524,10 @@ class AmazonS3 extends \OC\Files\Storage\Common {
 				return false;
 			}
 		} else {
-			if ($this->file_exists($path2)) {
-				return false;
+			if ($this->is_dir($path2)) {
+				$this->rmdir($path2);
+			} else if ($this->file_exists($path2)) {
+				$this->unlink($path2);
 			}
 
 			if ($this->copy($path1, $path2) === false) {
