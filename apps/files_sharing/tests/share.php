@@ -126,6 +126,55 @@ class Test_Files_Sharing extends Test_Files_Sharing_Base {
 	}
 
 	/**
+	 * if a file was shared as group share and as individual share they should be grouped
+	 */
+	function testGroupingOfShares() {
+
+		$fileinfo = $this->view->getFileInfo($this->filename);
+
+		$result = \OCP\Share::shareItem('file', $fileinfo['fileid'], \OCP\Share::SHARE_TYPE_GROUP,
+				\Test_Files_Sharing::TEST_FILES_SHARING_API_GROUP1, \OCP\PERMISSION_READ);
+
+		$this->assertTrue($result);
+
+		$result = \OCP\Share::shareItem('file', $fileinfo['fileid'], \OCP\Share::SHARE_TYPE_USER,
+				\Test_Files_Sharing::TEST_FILES_SHARING_API_USER2, \OCP\PERMISSION_UPDATE);
+
+		$this->assertTrue($result);
+
+		self::loginHelper(self::TEST_FILES_SHARING_API_USER2);
+
+		$result = \OCP\Share::getItemSharedWith('file', null);
+
+		$this->assertTrue(is_array($result));
+
+		// test should return exactly one shares created from testCreateShare()
+		$this->assertSame(1, count($result));
+
+		$share = reset($result);
+		$this->assertSame(\OCP\PERMISSION_READ | \OCP\PERMISSION_UPDATE, $share['permissions']);
+
+		\OC\Files\Filesystem::rename($this->filename, $this->filename . '-renamed');
+
+		$result = \OCP\Share::getItemSharedWith('file', null);
+
+		$this->assertTrue(is_array($result));
+
+		// test should return exactly one shares created from testCreateShare()
+		$this->assertSame(1, count($result));
+
+		$share = reset($result);
+		$this->assertSame(\OCP\PERMISSION_READ | \OCP\PERMISSION_UPDATE, $share['permissions']);
+		$this->assertSame($this->filename . '-renamed', $share['file_target']);
+
+		\OCP\Share::unshare('file', $fileinfo['fileid'], \OCP\Share::SHARE_TYPE_USER,
+				\Test_Files_Sharing::TEST_FILES_SHARING_API_USER2);
+
+		\OCP\Share::unshare('file', $fileinfo['fileid'], \OCP\Share::SHARE_TYPE_GROUP,
+				\Test_Files_Sharing::TEST_FILES_SHARING_API_GROUP1);
+	}
+
+	/**
 	 * shared files should never have delete permissions
 	 * @dataProvider  DataProviderTestFileSharePermissions
 	 */
