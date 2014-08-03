@@ -98,6 +98,11 @@ $this->create('core_avatar_post_cropped', '/avatar/cropped')
 	->post()
 	->action('OC\Core\Avatar\Controller', 'postCroppedAvatar');
 
+// Sharing routes
+$this->create('core_share_show_share', '/s/{token}')
+	->get()
+	->action('OC\Core\Share\Controller', 'showShare');
+
 // Not specifically routed
 $this->create('app_index_script', '/apps/{app}/')
 	->defaults(array('file' => 'index.php'))
