@@ -72,7 +72,14 @@ class App {
 		);
 
 		// rename to non-existing folder is denied
-		if (!$this->view->file_exists($dir)) {
+		if (!$this->view->file_exists($dir . '/' . $oldname)) {
+			$result['data'] = array(
+				'message'	=> $this->l10n->t('%s could not rename as it has been deleted', array($oldname)),
+				'code' => 'sourcenotfound',
+				'oldname' => $oldname,
+				'newname' => $newname,
+			);
+		}else if (!$this->view->file_exists($dir)) {
 			$result['data'] = array('message' => (string)$this->l10n->t(
 					'The target folder has been moved or deleted.',
 					array($dir)),
