@@ -47,6 +47,79 @@ class OC_Image {
 		}
 		return $imageType ? image_type_to_mime_type($imageType) : '';
 	}
+	
+	/**
+	* @brief Get image-type for mime-type. Inverse of image_type_to_mime_type()
+	* @param $mtype One of the mime types with a corresponding image type.
+	* @param $swf Specify swf or swc for application/x-shockwave-flash
+	* @param $intelbyteorder Sets byte order for image/tiff
+	* @param $octet Sets type of octet stream. jpc, jpx and jb2 are valid values
+	* @returns int One of the IMAGETYPE_XXX constants.
+	* @returns null If $mimetype has no corresponding imagetype
+	*/
+	static public function mime_type_to_image_type($mtype, $swf = true, $intelbyteorder = true, $octet = 'jpc') {
+		switch($mtype){
+			case 'image/gif':
+				$itype = IMAGETYPE_GIF;
+				break;
+			case 'image/jpeg':
+				$itype = IMAGETYPE_JPEG;
+				break;
+			case 'image/png':
+				$itype = IMAGETYPE_PNG;
+				break;
+			case 'application/x-shockwave-flash':
+				if ($swf) {
+					$itype = IMAGETYPE_SWF;
+				} else {
+					$itype = IMAGETYPE_SWC;
+				}
+				break;
+			case 'image/psd':
+				$itype = IMAGETYPE_PSD;
+				break;
+			case 'image/bmp':
+				$itype = IMAGETYPE_BMP;
+				break;
+			case 'image/tiff':
+				if ($intelbyteorder) {
+					$itype = IMAGETYPE_TIFF_II;
+				} else {
+					$itype = IMAGETYPE_TIFF_MM;
+				}
+				break;
+			case 'application/octet-stream':
+				if ($octet === 'jpc') {
+					$itype = IMAGETYPE_JPC;
+				} else if ($octet === 'jpx') {
+					$itype = IMAGETYPE_JPX;
+				} else if ($octet === 'jb2') {
+					$itype = IMAGETYPE_JB2;
+				} else {
+					$itype = null;
+				}
+				break;
+			case 'image/jp2':
+				$itype = IMAGETYPE_JP2;
+				break;
+			case 'image/iff':
+				$itype = IMAGETYPE_IFF;
+				break;
+			case 'image/vnd.wap.wbmp':
+				$itype = IMAGETYPE_WBMP
+				break;
+			case 'image/xbm':
+				$itype = IMAGETYPE_XBM;
+				break;
+			case 'image/vnd.microsoft.icon':
+				$itype = IMAGETYPE_ICO;
+				break;
+			default:
+				$itype = null;
+		}
+		
+		return $itype;
+	}
 
 	/**
 	* @brief Constructor.
@@ -521,6 +594,7 @@ class OC_Image {
 		$this->resource = @imagecreatefromstring($str);
 		if ($this->fileInfo) {
 			$this->mimeType = $this->fileInfo->buffer($str);
+			$this->imageType = $this->mime_type_to_image_type($this->mimeType());
 		}
 		if(is_resource($this->resource)) {
 			imagealphablending($this->resource, false);
@@ -548,6 +622,7 @@ class OC_Image {
 			$this->resource = @imagecreatefromstring($data);
 			if ($this->fileInfo) {
 				$this->mimeType = $this->fileInfo->buffer($data);
+				$this->imageType = $this->mime_type_to_image_type($this->mimeType());
 			}
 			if(!$this->resource) {
 				OC_Log::write('core', 'OC_Image->loadFromBase64, couldn\'t load', OC_Log::DEBUG);
