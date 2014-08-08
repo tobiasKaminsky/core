@@ -106,7 +106,7 @@ class OC_Image {
 				$itype = IMAGETYPE_IFF;
 				break;
 			case 'image/vnd.wap.wbmp':
-				$itype = IMAGETYPE_WBMP
+				$itype = IMAGETYPE_WBMP;
 				break;
 			case 'image/xbm':
 				$itype = IMAGETYPE_XBM;
